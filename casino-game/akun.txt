@@ -1,4 +1,3 @@
 siregar siregar123 pemain 500 50 250
-anton anton123 pemain 100 30 50
+anton anton123 pemain 0 32 -50
 andi andi123 pemain 300 40 100
-udin udin123  100 0 0

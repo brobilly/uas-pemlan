@@ -20,12 +20,13 @@ pemain currPlayer;
 int playerIndex;
 int totalUsers = 0;
 
-void gameMenu();//parameter profile
+void gameMenu();
 void adminMenu();
 void mainMenu();
 void registrasi();
 void loadGame();
 void importProfile();
+void updateData();
 void saveData();
 
 void displayProfile();
@@ -46,10 +47,9 @@ int main(){
 
 void mainMenu(){
 	int pilihan;
-    //while(1){
+    
     system("cls");
-    printf("----------------------------- PROJECT UAS CASINO GACOR -----------------------------\n");
-    printf("------------------------------- TEAM TWO NEVER END ---------------------------------\n\n");
+    printf("----------------------------- PROJECT UAS CASINO GACOR -----------------------------\n\n");
 	printf("1. New Profile\n");
     printf("2. Load Profile\n");
     printf("0. Exit & Save Progress\n");
@@ -57,29 +57,19 @@ void mainMenu(){
     scanf("%d", &pilihan);
     switch(pilihan){
         case 1:
-            //New profile
             registrasi();
             break;
         case 2:
-            //Load game profile
-            // if( role == 'admin'){
-                //adminMenu();
-            // }
             loadGame();
-            //gameMenu(currPlayer);
             break;
         case 0:
-            printf("Keluar game dan menyimpan progress...\n");
             saveData();
             return;
-        //default:
     }
-    //}
 }
 
 void gameMenu(){
     int pilihanGame;
-    //while (1) {
         displayProfile(currPlayer);
         printf("\n=== Daftar Game  ===\n");
         printf("0. Info game\n");
@@ -106,13 +96,13 @@ void gameMenu(){
                 playBarakat();
                 break;
             case 5:
+            	updateData();
                 printf("Kembali ke menu utama...\n");
                 mainMenu();
                 break;
             default:
                 printf("Pilihan tidak valid! masukkan nomor program...\n");
         }
-    //}
 }
 
 void importProfile(){
@@ -161,7 +151,7 @@ void registrasi(){
 		users[totalUsers].gamePlayed = 0;
 		users[totalUsers].profit = 0;
 		totalUsers++;
-		printf("\nAkun berhasil dibuat, silahkan login menggunakan username dan password akun yang telah dibuat!\n\n");
+		printf("\nAkun berhasil dibuat!\nSilahkan login menggunakan username dan password akun yang telah dibuat!\n\n");
 		loadGame();
 	}
 }
@@ -195,29 +185,35 @@ void displayProfile(){
 
 
 void playBlackjack() {
-    int playerBet, playerTotal = 0, dealerTotal = 0, flag = 1;
+    int playerBet;
+	int flag = 1;
     char choice;
     srand(time(NULL));
     while(1){
+    
+   	int playerTotal = 0;
+	int dealerTotal = 0;
     printf("1. Play\n0. Kembali\nPilihan:");
     scanf("%d", &flag);
-    if(flag == 0) gameMenu();
+    if(flag == 0){
+    	gameMenu();
+    	break;
+	}
     if (currPlayer.cash <= 0) {
         printf("Anda tidak memiliki chip untuk bermain!\n");
         gameMenu(currPlayer); // Kembali ke menu permainan
         return;
     }
 
-    printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
+    printf("\nMasukkan taruhan Anda (max %d): ", currPlayer.cash);
     scanf("%d", &playerBet);
     if (playerBet > currPlayer.cash || playerBet <= 0) {
-        printf("Taruhan tidak valid!\n");
-        gameMenu(currPlayer); // Kembali ke menu permainan
-        return;
+        printf("\nTaruhan tidak valid!\n");
+        playBlackjack(); // Kembali ke menu permainan
     }
 
     currPlayer.cash -= playerBet;
-    printf("Taruhan Anda: %d\n", playerBet);
+    printf("Taruhan Anda: %d\n\n", playerBet);
 
     // Mengacak kartu untuk pemain dan dealer
     playerTotal += rand() % 11 + 1; // Kartu pertama pemain
@@ -230,13 +226,13 @@ void playBlackjack() {
 
     // Pemain dapat memilih untuk 'hit' atau 'stand'
     while (1) {
-        printf("Apakah Anda ingin 'hit' (h) atau 'stand' (s)? ");
+        printf("\nApakah Anda ingin 'hit' (h) atau 'stand' (s)? ");
         scanf(" %c", &choice);
         if (choice == 'h') {
             playerTotal += rand() % 11 + 1; // Menambahkan kartu baru
             printf("Total kartu Anda sekarang: %d\n", playerTotal);
             if (playerTotal > 21) {
-                printf("Anda bust! Total Anda melebihi 21.\n");
+                printf("\nAnda bust! Total Anda melebihi 21.\n\n");
                 currPlayer.profit -= playerBet; // Pemain kalah
                 break;
             }
@@ -273,10 +269,6 @@ void playBlackjack() {
     currPlayer.gamePlayed++; // Menambah jumlah permainan yang dimainkan
     printf("Saldo Anda sekarang: %d\n", currPlayer.cash);
 
-    // Menunggu pengguna melihat hasil sebelum kembali ke menu
-    // printf("\nTekan tombol apa saja untuk kembali ke menu permainan...\n");
-    // getchar(); // Menangkap karakter newline sebelumnya
-    // getchar(); // Menunggu input dari pengguna
     system("pause");
     displayProfile();
     }
@@ -288,24 +280,38 @@ void playHighOrLow(){
 }
 
 void playHeadOrTail() {
-    char playerChoice[6]; // Head atau Tail
-    char computerChoice[6];
-    int randomChoice; // untuk menentukan pilihan komputer
-
+    char playerChoice[6], computerChoice[6]; // Head atau Tail
+    int randomChoice, flag = 1; // untuk menentukan pilihan komputer
+	int playerBet;
     while(1){
     // Menampilkan pilihan untuk pemain
+    printf("1. Play\n0. Kembali\nPilihan:");
+    scanf("%d", &flag);
+    if(flag == 0){
+    	gameMenu();
+    	break;
+	}
+
     printf("\n--- Permainan Head or Tail ---\n");
+    printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
+    scanf("%d", &playerBet);
+    if (playerBet > currPlayer.cash || playerBet <= 0) {
+        printf("Taruhan tidak valid!\n");
+        playHeadOrTail(); // Kembali ke menu permainan
+    }
+
+//    printf("Taruhan Anda: %d\n", playerBet);
     printf("Pilih 'Head' atau 'Tail' (0 untuk kembali): ");
     scanf("%s", playerChoice);
 
     // Memeriksa apakah pilihan pemain valid
     if(strcmp(playerChoice, "0") == 0) {
         gameMenu();
+        break;
     }
     if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0 && strcmp(playerChoice, "0") != 0) {
         printf("Pilihan tidak valid! Silakan pilih 'Head' atau 'Tail'.\n");
         playHeadOrTail(); // jika pilihan tidak valid, ulangi permainan
-        return;
     }
 
     // Pilihan acak komputer antara "Head" atau "Tail"
@@ -322,11 +328,12 @@ void playHeadOrTail() {
     // Menentukan hasil permainan
     if (strcmp(playerChoice, computerChoice) == 0) {
         printf("Selamat! Anda menang.\n");
-        currPlayer.cash += 10; // Menambahkan 10 chip pada pemain
-        currPlayer.profit += 10; // Menambahkan 10 pada profit pemain
+        currPlayer.cash += playerBet; // Menambahkan 10 chip pada pemain
+        currPlayer.profit += playerBet; // Menambahkan 10 pada profit pemain
     } else {
         printf("Sayang sekali, Anda kalah.\n");
-        currPlayer.cash -= 5; // Mengurangi 5 chip dari pemain
+        currPlayer.cash -= playerBet; // Mengurangi 5 chip dari pemain
+        currPlayer.profit -= playerBet;
     }
 
     // Menambahkan jumlah permainan yang telah dimainkan
@@ -339,7 +346,7 @@ void playHeadOrTail() {
 }
 
 void playBarakat(){
-    printf("%s", currPlayer.username);
+    
 }
 
 
@@ -356,12 +363,21 @@ int searching(const char* cariUsername, const char* cariPassword) {
     return 0;
 }
 
+void updateData() {
+	
+	    users[playerIndex].cash = currPlayer.cash;
+	    users[playerIndex].gamePlayed = currPlayer.gamePlayed;
+	    users[playerIndex].profit = currPlayer.profit;
+	
+}
+
 void saveData() {
     FILE* ptr = fopen("akun.txt", "w");
     if (ptr == NULL) {
         printf("Unable to open file for writing.\n");
         return;
     }
+    
 
     for (int i = 0; i < totalUsers; i++) {
         fprintf(ptr, "%s %s %s %d %d %d\n",
@@ -372,6 +388,7 @@ void saveData() {
                 users[i].gamePlayed,
                 users[i].profit);
     }
-
+	
     fclose(ptr);
+    printf("Keluar game dan menyimpan progress...\n");
 }
