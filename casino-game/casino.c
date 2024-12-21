@@ -276,7 +276,66 @@ void playBlackjack() {
 
 
 void playHighOrLow(){
+int angkaSekarang, angkaBerikutnya, tebakanPemain;
+    char lanjutGame;
+    int taruhan;
 
+    printf("\n=== Selamat Datang di High or Low ===\n");
+
+    do {
+        // Menghasilkan angka acak antara 1 hingga 100
+        angkaSekarang = rand() % 100 + 1;
+        printf("\nAngka sekarang adalah: %d\n", angkaSekarang);
+
+        // Meminta pemain untuk memasukkan taruhan
+        printf("\nMasukkan jumlah taruhan (Maks: %d): ", currPlayer.cash);
+        scanf("%d", &taruhan);
+
+        if (taruhan <= 0 || taruhan > currPlayer.cash) {
+            printf("Jumlah taruhan tidak valid. Coba lagi.\n");
+            continue;
+        }
+
+        // Meminta pemain menebak High (1) atau Low (0)
+        printf("\nApakah Anda pikir angka berikutnya akan lebih tinggi (1) atau lebih rendah (0)? ");
+        scanf("%d", &tebakanPemain);
+
+        if (tebakanPemain != 0 && tebakanPemain != 1) {
+            printf("Pilihan tidak valid. Harap masukkan 1 untuk Lebih Tinggi atau 0 untuk Lebih Rendah.\n");
+            continue;
+        }
+
+        // Menghasilkan angka acak berikutnya
+        angkaBerikutnya = rand() % 100 + 1;
+        printf("\nAngka berikutnya adalah: %d\n", angkaBerikutnya);
+
+        // Memeriksa apakah tebakan pemain benar
+        if ((tebakanPemain == 1 && angkaBerikutnya > angkaSekarang) || 
+            (tebakanPemain == 0 && angkaBerikutnya < angkaSekarang)) {
+            printf("\nSelamat! Tebakan Anda benar.\n");
+            currPlayer.cash += taruhan;
+            currPlayer.profit += taruhan;
+        } else {
+            printf("\nMaaf, tebakan Anda salah.\n");
+            currPlayer.cash -= taruhan;
+            currPlayer.profit -= taruhan;
+        }
+
+        currPlayer.gamePlayed++;
+
+        // Memeriksa apakah pemain kehabisan chip
+        if (currPlayer.cash <= 0) {
+            printf("\nAnda tidak memiliki chip lagi. Permainan selesai!\n");
+            break;
+        }
+
+        // Menanyakan apakah pemain ingin bermain lagi
+        printf("\nApakah Anda ingin bermain lagi? (Y/T): ");
+        scanf(" %c", &lanjutGame);
+
+    } while (lanjutGame == 'Y' || lanjutGame == 'y');
+
+    printf("\nTerima kasih telah bermain High or Low!\n\n");
 }
 
 void playHeadOrTail() {
