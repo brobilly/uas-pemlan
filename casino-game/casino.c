@@ -34,7 +34,6 @@ void displayProfile();
 void playBlackjack();
 void playHighOrLow();
 void playHeadOrTail();
-void playBarakat();
 
 int searching(const char* cariUsername, const char* cariPassword);
 
@@ -70,16 +69,21 @@ void mainMenu(){
 
 void gameMenu(){
     int pilihanGame;
+    while(1){
         displayProfile(currPlayer);
         printf("\n=== Daftar Game  ===\n");
         printf("0. Info game\n");
         printf("1. Blackjack\n");
         printf("2. High or Low\n");
         printf("3. Head or Tail\n");
-        printf("4. Barakat\n");
-        printf("5. Back to Main Menu\n");
+        printf("4. Back to Main Menu\n");
         printf("Pilih game : ");
-        scanf("%d", &pilihanGame);
+        if (scanf("%d", &pilihanGame) != 1) {
+            system("cls");
+            printf("Input tidak valid! Masukkan angka.\n");
+            while (getchar() != '\n'); 
+            continue; 
+        }
         switch (pilihanGame) {
             case 0:
                 break;
@@ -87,22 +91,20 @@ void gameMenu(){
                 playBlackjack();
                 break;
             case 2:
-                // playHighOrLow();
+                playHighOrLow();
                 break;
             case 3:
                 playHeadOrTail();
                 break;
             case 4:
-                playBarakat();
-                break;
-            case 5:
-            	updateData();
+                updateData();
                 printf("Kembali ke menu utama...\n");
                 mainMenu();
                 break;
             default:
                 printf("Pilihan tidak valid! masukkan nomor program...\n");
         }
+    }
 }
 
 void importProfile(){
@@ -186,228 +188,252 @@ void displayProfile(){
 
 void playBlackjack() {
     int playerBet;
-	int flag = 1;
+	int flag;
     char choice;
     srand(time(NULL));
     while(1){
-    
-   	int playerTotal = 0;
-	int dealerTotal = 0;
-    printf("1. Play\n0. Kembali\nPilihan:");
-    scanf("%d", &flag);
-    if(flag == 0){
-    	gameMenu();
-    	break;
-	}
-    if (currPlayer.cash <= 0) {
-        printf("Anda tidak memiliki chip untuk bermain!\n");
-        gameMenu(currPlayer); // Kembali ke menu permainan
-        return;
-    }
-
-    printf("\nMasukkan taruhan Anda (max %d): ", currPlayer.cash);
-    scanf("%d", &playerBet);
-    if (playerBet > currPlayer.cash || playerBet <= 0) {
-        printf("\nTaruhan tidak valid!\n");
-        playBlackjack(); // Kembali ke menu permainan
-    }
-
-    currPlayer.cash -= playerBet;
-    printf("Taruhan Anda: %d\n\n", playerBet);
-
-    // Mengacak kartu untuk pemain dan dealer
-    playerTotal += rand() % 11 + 1; // Kartu pertama pemain
-    playerTotal += rand() % 11 + 1; // Kartu kedua pemain
-    dealerTotal += rand() % 11 + 1; // Kartu pertama dealer
-    dealerTotal += rand() % 11 + 1; // Kartu kedua dealer
-
-    printf("Total kartu Anda: %d\n", playerTotal);
-    printf("Total kartu dealer: %d (satu kartu tertutup)\n", dealerTotal - (dealerTotal % 11)); // Menampilkan satu kartu dealer
-
-    // Pemain dapat memilih untuk 'hit' atau 'stand'
-    while (1) {
-        printf("\nApakah Anda ingin 'hit' (h) atau 'stand' (s)? ");
-        scanf(" %c", &choice);
-        if (choice == 'h') {
-            playerTotal += rand() % 11 + 1; // Menambahkan kartu baru
-            printf("Total kartu Anda sekarang: %d\n", playerTotal);
-            if (playerTotal > 21) {
-                printf("\nAnda bust! Total Anda melebihi 21.\n\n");
-                currPlayer.profit -= playerBet; // Pemain kalah
-                break;
-            }
-        } else if (choice == 's') {
-            break; // Pemain memilih untuk berhenti
-        } else {
-            printf("Pilihan tidak valid! Silakan pilih 'h' atau 's'.\n");
+        int playerTotal = 0;
+        int dealerTotal = 0;
+        printf("1. Play\n0. Kembali\nPilihan:");
+        if (scanf("%d", &flag) != 1) {
+            system("cls");
+            printf("Input tidak valid! Masukkan angka.\n");
+            while (getchar() != '\n'); 
+            continue; 
         }
-    }
+        switch(flag){
+            case 0:
+                gameMenu();
+                break;
+            case 1:
+                if (currPlayer.cash <= 0) {
+                    printf("Anda tidak memiliki chip untuk bermain!\n");
+                    gameMenu(currPlayer); // Kembali ke menu permainan
+                    return;
+                }
 
-    // Dealer bermain
-    printf("Dealer membuka kartu...\n");
-    printf("Total kartu dealer: %d\n", dealerTotal);
-    while (dealerTotal < 17) {
-        dealerTotal += rand() % 11 + 1; // Dealer menarik kartu
-        printf("Total kartu dealer sekarang: %d\n", dealerTotal);
-    }
+                printf("\nMasukkan taruhan Anda (max %d): ", currPlayer.cash);
+                scanf("%d", &playerBet);
+                if (playerBet > currPlayer.cash || playerBet <= 0) {
+                    printf("\nTaruhan tidak valid!\n");
+                    playBlackjack(); // Kembali ke menu permainan
+                }
 
-    // Menentukan pemenang
-    if (playerTotal > 21) {
-        printf("Anda kalah!\n");
-    } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
-        printf("Selamat! Anda menang!\n");
-        currPlayer.profit += playerBet; // Pemain menang
-        currPlayer.cash += playerBet*2; // Pemain menang
-    } else if (playerTotal < dealerTotal) {
-        printf("Dealer menang!\n");
-        currPlayer.profit -= playerBet; // Pemain kalah
-    } else {
-        printf("Seri! Taruhan Anda dikembalikan.\n");
-        currPlayer.cash += playerBet;
-    }
+                currPlayer.cash -= playerBet;
+                printf("Taruhan Anda: %d\n\n", playerBet);
 
-    currPlayer.gamePlayed++; // Menambah jumlah permainan yang dimainkan
-    printf("Saldo Anda sekarang: %d\n", currPlayer.cash);
+                // Mengacak kartu untuk pemain dan dealer
+                playerTotal += rand() % 11 + 1; // Kartu pertama pemain
+                playerTotal += rand() % 11 + 1; // Kartu kedua pemain
+                dealerTotal += rand() % 11 + 1; // Kartu pertama dealer
+                dealerTotal += rand() % 11 + 1; // Kartu kedua dealer
 
-    system("pause");
-    displayProfile();
+                printf("Total kartu Anda: %d\n", playerTotal);
+                printf("Total kartu dealer: %d (satu kartu tertutup)\n", dealerTotal - (dealerTotal % 11)); // Menampilkan satu kartu dealer
+
+                // Pemain dapat memilih untuk 'hit' atau 'stand'
+                while (1) {
+                    printf("\nApakah Anda ingin 'hit' (h) atau 'stand' (s)? ");
+                    scanf(" %c", &choice);
+                    if (choice == 'h') {
+                        playerTotal += rand() % 11 + 1; // Menambahkan kartu baru
+                        printf("Total kartu Anda sekarang: %d\n", playerTotal);
+                        if (playerTotal > 21) {
+                            printf("\nAnda bust! Total Anda melebihi 21.\n\n");
+                            currPlayer.profit -= playerBet; // Pemain kalah
+                            break;
+                        }
+                    } else if (choice == 's') {
+                        break; // Pemain memilih untuk berhenti
+                    } else {
+                        printf("Pilihan tidak valid! Silakan pilih 'h' atau 's'.\n");
+                    }
+                }
+
+                // Dealer bermain
+                printf("Dealer membuka kartu...\n");
+                printf("Total kartu dealer: %d\n", dealerTotal);
+                while (dealerTotal < 17) {
+                    dealerTotal += rand() % 11 + 1; // Dealer menarik kartu
+                    printf("Total kartu dealer sekarang: %d\n", dealerTotal);
+                }
+
+                // Menentukan pemenang
+                if (playerTotal > 21) {
+                    printf("Anda kalah!\n");
+                } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+                    printf("Selamat! Anda menang!\n");
+                    currPlayer.profit += playerBet; // Pemain menang
+                    currPlayer.cash += playerBet*2; // Pemain menang
+                } else if (playerTotal < dealerTotal) {
+                    printf("Dealer menang!\n");
+                    currPlayer.profit -= playerBet; // Pemain kalah
+                } else {
+                    printf("Seri! Taruhan Anda dikembalikan.\n");
+                    currPlayer.cash += playerBet;
+                }
+
+                currPlayer.gamePlayed++; // Menambah jumlah permainan yang dimainkan
+                printf("Saldo Anda sekarang: %d\n", currPlayer.cash);
+
+                system("pause");
+                displayProfile();
+                default:
+                    system("cls");
+                    printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                    break;
+        }
     }
 }
 
 
 void playHighOrLow(){
-int angkaSekarang, angkaBerikutnya, tebakanPemain;
-    char lanjutGame;
-    int taruhan;
+int playerBet, flag = 1;
+    int currentCard, nextCard;
+    char choice;
 
-    printf("\n=== Selamat Datang di High or Low ===\n");
+    srand(time(NULL));
 
-    do {
-        // Menghasilkan angka acak antara 1 hingga 100
-        angkaSekarang = rand() % 100 + 1;
-        printf("\nAngka sekarang adalah: %d\n", angkaSekarang);
-
-        // Meminta pemain untuk memasukkan taruhan
-        printf("\nMasukkan jumlah taruhan (Maks: %d): ", currPlayer.cash);
-        scanf("%d", &taruhan);
-
-        if (taruhan <= 0 || taruhan > currPlayer.cash) {
-            printf("Jumlah taruhan tidak valid. Coba lagi.\n");
-            continue;
+    while (1) {
+        printf("1. Play\n0. Kembali\nPilihan: ");
+        if (scanf("%d", &flag) != 1) {
+            system("cls");
+            printf("Input tidak valid! Masukkan angka.\n");
+            while (getchar() != '\n'); 
+            continue; 
         }
+        switch(flag){
+            case 0:
+                gameMenu();
+                break;
+            case 1:
+                if (currPlayer.cash <= 0) {
+                    printf("Anda tidak memiliki chip untuk bermain!\n");
+                    gameMenu();
+                    return;
+                }
 
-        // Meminta pemain menebak High (1) atau Low (0)
-        printf("\nApakah Anda pikir angka berikutnya akan lebih tinggi (1) atau lebih rendah (0)? ");
-        scanf("%d", &tebakanPemain);
+                printf("\n--- Permainan High or Low ---\n");
+                printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
+                scanf("%d", &playerBet);
 
-        if (tebakanPemain != 0 && tebakanPemain != 1) {
-            printf("Pilihan tidak valid. Harap masukkan 1 untuk Lebih Tinggi atau 0 untuk Lebih Rendah.\n");
-            continue;
+                if (playerBet > currPlayer.cash || playerBet <= 0) {
+                    printf("Taruhan tidak valid!\n");
+                    continue;
+                }
+
+                currPlayer.cash -= playerBet;
+
+                currentCard = rand() % 13 + 1;
+                printf("Kartu awal Anda adalah: %d\n", currentCard);
+
+                printf("Apakah kartu berikutnya 'high' (h) atau 'low' (l)? ");
+                scanf(" %c", &choice);
+
+                nextCard = rand() % 13 + 1;
+                printf("Kartu berikutnya adalah: %d\n", nextCard);
+
+                if ((choice == 'h' && nextCard > currentCard) || 
+                    (choice == 'l' && nextCard < currentCard)) {
+                    printf("Selamat! Anda menang.\n");
+                    currPlayer.cash += playerBet * 2;
+                    currPlayer.profit += playerBet;
+                } else if (nextCard == currentCard) {
+                    printf("Kartu sama! Tidak ada pemenang.\n");
+                    currPlayer.cash += playerBet;
+                } else {
+                    printf("Sayang sekali, Anda kalah.\n");
+                    currPlayer.profit -= playerBet;
+                }
+
+                currPlayer.gamePlayed++;
+                printf("Saldo Anda sekarang: %d\n", currPlayer.cash);
+                system("pause");
+                displayProfile();
+            default:
+                system("cls");
+                printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                break;
         }
-
-        // Menghasilkan angka acak berikutnya
-        angkaBerikutnya = rand() % 100 + 1;
-        printf("\nAngka berikutnya adalah: %d\n", angkaBerikutnya);
-
-        // Memeriksa apakah tebakan pemain benar
-        if ((tebakanPemain == 1 && angkaBerikutnya > angkaSekarang) || 
-            (tebakanPemain == 0 && angkaBerikutnya < angkaSekarang)) {
-            printf("\nSelamat! Tebakan Anda benar.\n");
-            currPlayer.cash += taruhan;
-            currPlayer.profit += taruhan;
-        } else {
-            printf("\nMaaf, tebakan Anda salah.\n");
-            currPlayer.cash -= taruhan;
-            currPlayer.profit -= taruhan;
-        }
-
-        currPlayer.gamePlayed++;
-
-        // Memeriksa apakah pemain kehabisan chip
-        if (currPlayer.cash <= 0) {
-            printf("\nAnda tidak memiliki chip lagi. Permainan selesai!\n");
-            break;
-        }
-
-        // Menanyakan apakah pemain ingin bermain lagi
-        printf("\nApakah Anda ingin bermain lagi? (Y/T): ");
-        scanf(" %c", &lanjutGame);
-
-    } while (lanjutGame == 'Y' || lanjutGame == 'y');
-
-    printf("\nTerima kasih telah bermain High or Low!\n\n");
+    }
 }
 
 void playHeadOrTail() {
     char playerChoice[6], computerChoice[6]; // Head atau Tail
-    int randomChoice, flag = 1; // untuk menentukan pilihan komputer
-	int playerBet;
+    int randomChoice, flag; // untuk menentukan pilihan komputer
+    int playerBet;
     while(1){
-    // Menampilkan pilihan untuk pemain
-    printf("1. Play\n0. Kembali\nPilihan:");
-    scanf("%d", &flag);
-    if(flag == 0){
-    	gameMenu();
-    	break;
-	}
+        // Menampilkan pilihan untuk pemain
+        printf("1. Play\n0. Kembali\nPilihan:");
+        if (scanf("%d", &flag) != 1) {
+            system("cls");
+            printf("Input tidak valid! Masukkan angka.\n");
+            while (getchar() != '\n'); 
+            continue; 
+        }
+        switch(flag){
+            case 0:
+                gameMenu();
+                break;
+            case 1:
+                printf("\n--- Permainan Head or Tail ---\n");
+                printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
+                scanf("%d", &playerBet);
+                if (playerBet > currPlayer.cash || playerBet <= 0) {
+                    printf("Taruhan tidak valid!\n");
+                    playHeadOrTail(); // Kembali ke menu permainan
+                }
 
-    printf("\n--- Permainan Head or Tail ---\n");
-    printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
-    scanf("%d", &playerBet);
-    if (playerBet > currPlayer.cash || playerBet <= 0) {
-        printf("Taruhan tidak valid!\n");
-        playHeadOrTail(); // Kembali ke menu permainan
-    }
+            //    printf("Taruhan Anda: %d\n", playerBet);
+                printf("Pilih 'Head' atau 'Tail' (0 untuk kembali): ");
+                scanf("%s", playerChoice);
 
-//    printf("Taruhan Anda: %d\n", playerBet);
-    printf("Pilih 'Head' atau 'Tail' (0 untuk kembali): ");
-    scanf("%s", playerChoice);
+                // Memeriksa apakah pilihan pemain valid
+                if(strcmp(playerChoice, "0") == 0) {
+                    gameMenu();
+                    break;
+                }
+                if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0 && strcmp(playerChoice, "0") != 0) {
+                    printf("Pilihan tidak valid! Silakan pilih 'Head' atau 'Tail'.\n");
+                    playHeadOrTail(); // jika pilihan tidak valid, ulangi permainan
+                }
 
-    // Memeriksa apakah pilihan pemain valid
-    if(strcmp(playerChoice, "0") == 0) {
-        gameMenu();
-        break;
-    }
-    if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0 && strcmp(playerChoice, "0") != 0) {
-        printf("Pilihan tidak valid! Silakan pilih 'Head' atau 'Tail'.\n");
-        playHeadOrTail(); // jika pilihan tidak valid, ulangi permainan
-    }
+                // Pilihan acak komputer antara "Head" atau "Tail"
+                randomChoice = rand() % 2; // menghasilkan angka 0 atau 1
+                if (randomChoice == 0) {
+                    strcpy(computerChoice, "Head");
+                } else {
+                    strcpy(computerChoice, "Tail");
+                }
 
-    // Pilihan acak komputer antara "Head" atau "Tail"
-    randomChoice = rand() % 2; // menghasilkan angka 0 atau 1
-    if (randomChoice == 0) {
-        strcpy(computerChoice, "Head");
-    } else {
-        strcpy(computerChoice, "Tail");
-    }
+                // Menampilkan pilihan komputer
+                printf("Koin dilempar dan menunjukan: %s\n", computerChoice);
 
-    // Menampilkan pilihan komputer
-    printf("Koin dilempar dan menunjukan: %s\n", computerChoice);
+                // Menentukan hasil permainan
+                if (strcmp(playerChoice, computerChoice) == 0) {
+                    printf("Selamat! Anda menang.\n");
+                    currPlayer.cash += playerBet; // Menambahkan 10 chip pada pemain
+                    currPlayer.profit += playerBet; // Menambahkan 10 pada profit pemain
+                } else {
+                    printf("Sayang sekali, Anda kalah.\n");
+                    currPlayer.cash -= playerBet; // Mengurangi 5 chip dari pemain
+                    currPlayer.profit -= playerBet;
+                }
 
-    // Menentukan hasil permainan
-    if (strcmp(playerChoice, computerChoice) == 0) {
-        printf("Selamat! Anda menang.\n");
-        currPlayer.cash += playerBet; // Menambahkan 10 chip pada pemain
-        currPlayer.profit += playerBet; // Menambahkan 10 pada profit pemain
-    } else {
-        printf("Sayang sekali, Anda kalah.\n");
-        currPlayer.cash -= playerBet; // Mengurangi 5 chip dari pemain
-        currPlayer.profit -= playerBet;
-    }
+                // Menambahkan jumlah permainan yang telah dimainkan
+                currPlayer.gamePlayed++;
 
-    // Menambahkan jumlah permainan yang telah dimainkan
-    currPlayer.gamePlayed++;
-
-    // Tampilkan profil pemain setelah permainan
-    system("pause");
-    displayProfile();
+                // Tampilkan profil pemain setelah permainan
+                system("pause");
+                displayProfile();
+                break;
+            default:
+                system("cls");
+                printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                break;
+        }
     }
 }
-
-void playBarakat(){
-    
-}
-
 
 int searching(const char* cariUsername, const char* cariPassword) {
     for (int i = 0; i < totalUsers; i++) {
