@@ -199,8 +199,50 @@ void playBlackjack(){
 void playHighOrLow(){
 
 }
-void playHeadOrTail(){
 
+void playHeadOrTail() {
+    char playerChoice[6]; // Head atau Tail
+    char computerChoice[6];
+    int randomChoice; // untuk menentukan pilihan komputer
+
+    // Menampilkan pilihan untuk pemain
+    printf("\n--- Permainan Head or Tail ---\n");
+    printf("Pilih 'Head' atau 'Tail': ");
+    scanf("%s", playerChoice);
+
+    // Memeriksa apakah pilihan pemain valid
+    if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0) {
+        printf("Pilihan tidak valid! Silakan pilih 'Head' atau 'Tail'.\n");
+        playHeadOrTail(); // jika pilihan tidak valid, ulangi permainan
+        return;
+    }
+
+    // Pilihan acak komputer antara "Head" atau "Tail"
+    randomChoice = rand() % 2; // menghasilkan angka 0 atau 1
+    if (randomChoice == 0) {
+        strcpy(computerChoice, "Head");
+    } else {
+        strcpy(computerChoice, "Tail");
+    }
+
+    // Menampilkan pilihan komputer
+    printf("Pilihan komputer: %s\n", computerChoice);
+
+    // Menentukan hasil permainan
+    if (strcmp(playerChoice, computerChoice) == 0) {
+        printf("Selamat! Anda menang.\n");
+        currPlayer.cash += 10; // Menambahkan 10 chip pada pemain
+        currPlayer.profit += 10; // Menambahkan 10 pada profit pemain
+    } else {
+        printf("Sayang sekali, Anda kalah.\n");
+        currPlayer.cash -= 5; // Mengurangi 5 chip dari pemain
+    }
+
+    // Menambahkan jumlah permainan yang telah dimainkan
+    currPlayer.gamePlayed++;
+
+    // Tampilkan profil pemain setelah permainan
+    displayProfile();
 }
 
 void playBarakat(){
