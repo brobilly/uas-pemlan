@@ -19,6 +19,7 @@ pemain users[100];
 pemain currPlayer;
 int playerIndex;
 int totalUsers = 0;
+int isRunning = 1;
 
 void gameMenu();
 void adminMenu();
@@ -63,13 +64,14 @@ void mainMenu(){
             break;
         case 0:
             saveData();
+            isRunning = 0;
             return;
     }
 }
 
 void gameMenu(){
     int pilihanGame;
-    while(1){
+    while(isRunning){
         displayProfile(currPlayer);
         printf("\n=== Daftar Game  ===\n");
         printf("0. Info game\n");
@@ -172,7 +174,7 @@ void loadGame(){
         printf("Profil ditemukan. Selamat datang, %s!\n", tempUsername);
         system("pause");
         currPlayer = users[playerIndex];
-        gameMenu(currPlayer);
+        gameMenu();
     } else {
         printf("\nUsername atau password salah.\n\n");
         loadGame();
@@ -191,7 +193,7 @@ void playBlackjack() {
 	int flag;
     char choice;
     srand(time(NULL));
-    while(1){
+    while(isRunning){
         int playerTotal = 0;
         int dealerTotal = 0;
         printf("1. Play\n0. Kembali\nPilihan:");
@@ -294,7 +296,7 @@ int playerBet, flag = 1;
 
     srand(time(NULL));
 
-    while (1) {
+    while(isRunning){
         printf("1. Play\n0. Kembali\nPilihan: ");
         if (scanf("%d", &flag) != 1) {
             system("cls");
@@ -362,7 +364,7 @@ void playHeadOrTail() {
     char playerChoice[6], computerChoice[6]; // Head atau Tail
     int randomChoice, flag; // untuk menentukan pilihan komputer
     int playerBet;
-    while(1){
+    while(isRunning){
         // Menampilkan pilihan untuk pemain
         printf("1. Play\n0. Kembali\nPilihan:");
         if (scanf("%d", &flag) != 1) {
