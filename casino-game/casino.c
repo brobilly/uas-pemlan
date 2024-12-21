@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 struct profilePemain{
@@ -93,7 +94,7 @@ void gameMenu(){
             case 0:
                 break;
             case 1:
-                playBlackjack(currPlayer);
+                playBlackjack();
                 break;
             case 2:
                 // playHighOrLow();
@@ -102,7 +103,7 @@ void gameMenu(){
                 playHeadOrTail();
                 break;
             case 4:
-                playBarakat(currPlayer);
+                playBarakat();
                 break;
             case 5:
                 printf("Kembali ke menu utama...\n");
@@ -193,11 +194,14 @@ void displayProfile(){
 }
 
 
-void playBlackjack(pemain currPlayer) {
-    int playerBet, playerTotal = 0, dealerTotal = 0;
+void playBlackjack() {
+    int playerBet, playerTotal = 0, dealerTotal = 0, flag = 1;
     char choice;
     srand(time(NULL));
-
+    while(1){
+    printf("1. Play\n0. Kembali\nPilihan:");
+    scanf("%d", &flag);
+    if(flag == 0) gameMenu();
     if (currPlayer.cash <= 0) {
         printf("Anda tidak memiliki chip untuk bermain!\n");
         gameMenu(currPlayer); // Kembali ke menu permainan
@@ -257,23 +261,25 @@ void playBlackjack(pemain currPlayer) {
     } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
         printf("Selamat! Anda menang!\n");
         currPlayer.profit += playerBet; // Pemain menang
+        currPlayer.cash += playerBet*2; // Pemain menang
     } else if (playerTotal < dealerTotal) {
         printf("Dealer menang!\n");
         currPlayer.profit -= playerBet; // Pemain kalah
     } else {
         printf("Seri! Taruhan Anda dikembalikan.\n");
+        currPlayer.cash += playerBet;
     }
 
     currPlayer.gamePlayed++; // Menambah jumlah permainan yang dimainkan
-    printf("Saldo Anda sekarang: %d\n", currPlayer.cash + currPlayer.profit);
+    printf("Saldo Anda sekarang: %d\n", currPlayer.cash);
 
     // Menunggu pengguna melihat hasil sebelum kembali ke menu
-    printf("\nTekan tombol apa saja untuk kembali ke menu permainan...\n");
-    getchar(); // Menangkap karakter newline sebelumnya
-    getchar(); // Menunggu input dari pengguna
-
-    // Kembali ke menu permainan
-    gameMenu(currPlayer);
+    // printf("\nTekan tombol apa saja untuk kembali ke menu permainan...\n");
+    // getchar(); // Menangkap karakter newline sebelumnya
+    // getchar(); // Menunggu input dari pengguna
+    system("pause");
+    displayProfile();
+    }
 }
 
 
@@ -286,13 +292,17 @@ void playHeadOrTail() {
     char computerChoice[6];
     int randomChoice; // untuk menentukan pilihan komputer
 
+    while(1){
     // Menampilkan pilihan untuk pemain
     printf("\n--- Permainan Head or Tail ---\n");
-    printf("Pilih 'Head' atau 'Tail': ");
+    printf("Pilih 'Head' atau 'Tail' (0 untuk kembali): ");
     scanf("%s", playerChoice);
 
     // Memeriksa apakah pilihan pemain valid
-    if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0) {
+    if(strcmp(playerChoice, "0") == 0) {
+        gameMenu();
+    }
+    if (strcmp(playerChoice, "Head") != 0 && strcmp(playerChoice, "Tail") != 0 && strcmp(playerChoice, "0") != 0) {
         printf("Pilihan tidak valid! Silakan pilih 'Head' atau 'Tail'.\n");
         playHeadOrTail(); // jika pilihan tidak valid, ulangi permainan
         return;
@@ -307,7 +317,7 @@ void playHeadOrTail() {
     }
 
     // Menampilkan pilihan komputer
-    printf("Pilihan komputer: %s\n", computerChoice);
+    printf("Koin dilempar dan menunjukan: %s\n", computerChoice);
 
     // Menentukan hasil permainan
     if (strcmp(playerChoice, computerChoice) == 0) {
@@ -323,7 +333,9 @@ void playHeadOrTail() {
     currPlayer.gamePlayed++;
 
     // Tampilkan profil pemain setelah permainan
+    system("pause");
     displayProfile();
+    }
 }
 
 void playBarakat(){
