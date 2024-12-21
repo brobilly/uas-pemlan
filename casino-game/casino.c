@@ -37,10 +37,10 @@ void playBarakat();
 int searching(const char* cariUsername, const char* cariPassword);
 
 int main(){
-    
+
 	importProfile();
     mainMenu();
-    
+
 }
 
 void mainMenu(){
@@ -93,13 +93,13 @@ void gameMenu(){
             case 0:
                 break;
             case 1:
-                // playBlackjack();
+                playBlackjack(currPlayer);
                 break;
             case 2:
                 // playHighOrLow();
                 break;
             case 3:
-                // playHeadOrTail();
+                playHeadOrTail();
                 break;
             case 4:
                 playBarakat(currPlayer);
@@ -115,21 +115,21 @@ void gameMenu(){
 }
 
 void importProfile(){
-	
+
 	FILE* ptr = fopen("akun.txt", "r");
     if (ptr == NULL) {
         printf("no such file.");
         return;
     }
-	
+
     char buf[100];
-    while (fscanf(ptr, "%s %s %s %d %d %d ", users[totalUsers].username, 
-                  users[totalUsers].password, 
-                  users[totalUsers].role, 
-                  &users[totalUsers].cash, 
-                  &users[totalUsers].gamePlayed, 
+    while (fscanf(ptr, "%s %s %s %d %d %d ", users[totalUsers].username,
+                  users[totalUsers].password,
+                  users[totalUsers].role,
+                  &users[totalUsers].cash,
+                  &users[totalUsers].gamePlayed,
                   &users[totalUsers].profit) == 6){
-        totalUsers++;    
+        totalUsers++;
 	}
 	fclose(ptr);
 }
@@ -144,12 +144,12 @@ void adminMenu(){
 void registrasi(){
 	char tempUsername[20];
 	char tempPassword[20];
-	
+
 	printf("Masukkan username baru: ");
 	scanf("%20s", tempUsername);
 	printf("Masukkan password baru: ");
 	scanf("%20s", tempPassword);
-	
+
 	if(searching(tempUsername, tempPassword) >= 1){
 		printf("Username sudah ada. Gunakan username lain!\n");
 		registrasi();
@@ -169,11 +169,11 @@ void registrasi(){
 void loadGame(){
     char tempUsername[20];
     char tempPassword[20];
-    
+
     printf("Masukkan username: ");
-    scanf("%10s", tempUsername); 
+    scanf("%10s", tempUsername);
     printf("Masukkan password: ");
-    scanf("%20s", tempPassword); 
+    scanf("%20s", tempPassword);
 
     if (searching(tempUsername, tempPassword) == 1) {
         printf("Profil ditemukan. Selamat datang, %s!\n", tempUsername);
@@ -193,9 +193,90 @@ void displayProfile(){
 }
 
 
-void playBlackjack(){
+void playBlackjack(pemain currPlayer) {
+    int playerBet, playerTotal = 0, dealerTotal = 0;
+    char choice;
+    srand(time(NULL));
 
+    if (currPlayer.cash <= 0) {
+        printf("Anda tidak memiliki chip untuk bermain!\n");
+        gameMenu(currPlayer); // Kembali ke menu permainan
+        return;
+    }
+
+    printf("Masukkan taruhan Anda (max %d): ", currPlayer.cash);
+    scanf("%d", &playerBet);
+    if (playerBet > currPlayer.cash || playerBet <= 0) {
+        printf("Taruhan tidak valid!\n");
+        gameMenu(currPlayer); // Kembali ke menu permainan
+        return;
+    }
+
+    currPlayer.cash -= playerBet;
+    printf("Taruhan Anda: %d\n", playerBet);
+
+    // Mengacak kartu untuk pemain dan dealer
+    playerTotal += rand() % 11 + 1; // Kartu pertama pemain
+    playerTotal += rand() % 11 + 1; // Kartu kedua pemain
+    dealerTotal += rand() % 11 + 1; // Kartu pertama dealer
+    dealerTotal += rand() % 11 + 1; // Kartu kedua dealer
+
+    printf("Total kartu Anda: %d\n", playerTotal);
+    printf("Total kartu dealer: %d (satu kartu tertutup)\n", dealerTotal - (dealerTotal % 11)); // Menampilkan satu kartu dealer
+
+    // Pemain dapat memilih untuk 'hit' atau 'stand'
+    while (1) {
+        printf("Apakah Anda ingin 'hit' (h) atau 'stand' (s)? ");
+        scanf(" %c", &choice);
+        if (choice == 'h') {
+            playerTotal += rand() % 11 + 1; // Menambahkan kartu baru
+            printf("Total kartu Anda sekarang: %d\n", playerTotal);
+            if (playerTotal > 21) {
+                printf("Anda bust! Total Anda melebihi 21.\n");
+                currPlayer.profit -= playerBet; // Pemain kalah
+                break;
+            }
+        } else if (choice == 's') {
+            break; // Pemain memilih untuk berhenti
+        } else {
+            printf("Pilihan tidak valid! Silakan pilih 'h' atau 's'.\n");
+        }
+    }
+
+    // Dealer bermain
+    printf("Dealer membuka kartu...\n");
+    printf("Total kartu dealer: %d\n", dealerTotal);
+    while (dealerTotal < 17) {
+        dealerTotal += rand() % 11 + 1; // Dealer menarik kartu
+        printf("Total kartu dealer sekarang: %d\n", dealerTotal);
+    }
+
+    // Menentukan pemenang
+    if (playerTotal > 21) {
+        printf("Anda kalah!\n");
+    } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+        printf("Selamat! Anda menang!\n");
+        currPlayer.profit += playerBet; // Pemain menang
+    } else if (playerTotal < dealerTotal) {
+        printf("Dealer menang!\n");
+        currPlayer.profit -= playerBet; // Pemain kalah
+    } else {
+        printf("Seri! Taruhan Anda dikembalikan.\n");
+    }
+
+    currPlayer.gamePlayed++; // Menambah jumlah permainan yang dimainkan
+    printf("Saldo Anda sekarang: %d\n", currPlayer.cash + currPlayer.profit);
+
+    // Menunggu pengguna melihat hasil sebelum kembali ke menu
+    printf("\nTekan tombol apa saja untuk kembali ke menu permainan...\n");
+    getchar(); // Menangkap karakter newline sebelumnya
+    getchar(); // Menunggu input dari pengguna
+
+    // Kembali ke menu permainan
+    gameMenu(currPlayer);
 }
+
+
 void playHighOrLow(){
 
 }
@@ -255,7 +336,7 @@ int searching(const char* cariUsername, const char* cariPassword) {
         if (strcmp(cariUsername, users[i].username) == 0) {
         	if(strcmp(cariPassword, users[i].password) == 0){
         		playerIndex = i;
-            	return 1; 
+            	return 1;
 			}
             return 2;
         }
@@ -271,12 +352,12 @@ void saveData() {
     }
 
     for (int i = 0; i < totalUsers; i++) {
-        fprintf(ptr, "%s %s %s %d %d %d\n", 
-                users[i].username, 
-                users[i].password, 
-                users[i].role, 
-                users[i].cash, 
-                users[i].gamePlayed, 
+        fprintf(ptr, "%s %s %s %d %d %d\n",
+                users[i].username,
+                users[i].password,
+                users[i].role,
+                users[i].cash,
+                users[i].gamePlayed,
                 users[i].profit);
     }
 
