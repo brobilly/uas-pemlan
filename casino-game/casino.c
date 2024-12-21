@@ -104,7 +104,7 @@ void gameMenu(){
                 mainMenu();
                 break;
             default:
-                printf("Pilihan tidak valid! masukkan nomor program...\n");
+                displayProfile();
         }
     }
 }
@@ -282,7 +282,7 @@ void playBlackjack() {
                 displayProfile();
                 default:
                     system("cls");
-                    printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                    displayProfile();
                     break;
         }
     }
@@ -354,7 +354,7 @@ int playerBet, flag = 1;
                 displayProfile();
             default:
                 system("cls");
-                printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                displayProfile();
                 break;
         }
     }
@@ -431,7 +431,7 @@ void playHeadOrTail() {
                 break;
             default:
                 system("cls");
-                printf("Pilihan tidak valid masukkan nomor pilihan...!!!\n");
+                displayProfile();
                 break;
         }
     }
